@@ -1,7 +1,6 @@
 .DS_Store
 *.swp
 *.Trashes
-Library
 Temp
 *.csproj
 *.pidb
@@ -10,3 +9,7 @@ Temp
 *.userprefs
 
 Assets/Binaries
+
+Library/cache
+Library/metadata
+Library/ScriptAssemblies
