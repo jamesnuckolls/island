@@ -9,16 +9,19 @@ public class DropboxSync : EditorWindow
 	
 	public static string dropboxAssetPath;
 	public static string md5FilePath;
+	public static string localAssetPath;
 
-	public static string localAssetPath = "/Users/jnuckolls/Documents/Programming/game/island/Assets/Binaries/";
+	//public static string localAssetPath = "/Users/jnuckolls/Documents/Programming/game/island/Assets/Binaries/";
 
 	/// <summary>
 	/// Function for assigning the different paths required for menu items to function.
 	/// </summary>
-	[MenuItem ("Sync/Set Asset Folder...")]
+	[MenuItem ("Sync/Path Settings")]
 	static void SetFolder () 
 	{
 		dropboxAssetPath = EditorPrefs.GetString("dropbox_path", "c:/users/example/dropbox");
+		md5FilePath = EditorPrefs.GetString ("md5_path", md5FilePath);
+		localAssetPath = EditorPrefs.GetString ("local_asset_path", localAssetPath);
 		EditorWindow.GetWindow<DropboxSync>();
 	}
 
@@ -26,21 +29,21 @@ public class DropboxSync : EditorWindow
 	/// Less intelligent version of synch.  Always prefers DropBox files and does not
 	///  copy local files to DropBox.
 	/// </summary>
-	[MenuItem ("Sync/Sync Binary Assets")]
-	static void SyncAssets () 
-	{
-		dropboxAssetPath = EditorPrefs.GetString("dropbox_path", "c:/users/example/dropbox");
-		Debug.Log("Syncing Assets from: " + dropboxAssetPath + "... please wait...");
-		foreach (string dirPath in Directory.GetDirectories(dropboxAssetPath, "*", SearchOption.AllDirectories))
-			Directory.CreateDirectory(dirPath.Replace(dropboxAssetPath, localAssetPath));
-		
-		foreach (string newPath in Directory.GetFiles(dropboxAssetPath, "*.*", SearchOption.AllDirectories))
-			File.Copy(newPath, newPath.Replace(dropboxAssetPath, localAssetPath), true);
-		
-		AssetDatabase.Refresh();
-		
-		Debug.Log("Done Syncing Assets.");
-	}
+//	[MenuItem ("Sync/Sync Binary Assets")]
+//	static void SyncAssets () 
+//	{
+//		dropboxAssetPath = EditorPrefs.GetString("dropbox_path", "c:/users/example/dropbox");
+//		Debug.Log("Syncing Assets from: " + dropboxAssetPath + "... please wait...");
+//		foreach (string dirPath in Directory.GetDirectories(dropboxAssetPath, "*", SearchOption.AllDirectories))
+//			Directory.CreateDirectory(dirPath.Replace(dropboxAssetPath, localAssetPath));
+//		
+//		foreach (string newPath in Directory.GetFiles(dropboxAssetPath, "*.*", SearchOption.AllDirectories))
+//			File.Copy(newPath, newPath.Replace(dropboxAssetPath, localAssetPath), true);
+//		
+//		AssetDatabase.Refresh();
+//		
+//		Debug.Log("Done Syncing Assets.");
+//	}
 
 	/// <summary>
 	/// Synch between local binary asset directory and a DropBox binary asset directory.
@@ -50,6 +53,7 @@ public class DropboxSync : EditorWindow
 	{
 		dropboxAssetPath = EditorPrefs.GetString("dropbox_path", "c:/users/example/dropbox");
 		md5FilePath = EditorPrefs.GetString ("md5_path", "c:/users/example/md5");
+		localAssetPath = EditorPrefs.GetString ("local_asset_path", "Assets/Binaries");
 
 		// load serialized md5
 		var diskMd5 = GetMd5FromDisk (md5FilePath);
@@ -158,10 +162,12 @@ public class DropboxSync : EditorWindow
 		GUILayout.Label ("Set a path to a folder in dropbox that will contain your binary assets.", EditorStyles.boldLabel);
 		dropboxAssetPath = EditorGUILayout.TextField ("DropBox Path", dropboxAssetPath);
 		md5FilePath = EditorGUILayout.TextField ("TempPath", md5FilePath);
+		localAssetPath = EditorGUILayout.TextField ("Local Asset Path", localAssetPath);
 
 		if(GUILayout.Button("Save")) {
 			EditorPrefs.SetString("dropbox_path", dropboxAssetPath);
 			EditorPrefs.SetString ("md5_path", md5FilePath);
+			EditorPrefs.SetString ("local_asset_path", localAssetPath);
 		}
 	}
 
