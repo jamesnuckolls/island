@@ -10,7 +10,7 @@ public class DropboxSync : EditorWindow
 	public static string dropboxAssetPath;
 	public static string md5FilePath;
 
-	public static string localAssetPath = "Assets/Binaries";
+	public static string localAssetPath = "/Users/jnuckolls/Documents/Programming/game/island/Assets/Binaries/";
 
 	/// <summary>
 	/// Function for assigning the different paths required for menu items to function.
@@ -90,9 +90,17 @@ public class DropboxSync : EditorWindow
 
 		foreach(string diffFilePath in diffFiles)
 		{
+			string fullDestinationPath = Path.Combine(destinationPath, diffFilePath);
+			string destinationDir = Path.GetDirectoryName(fullDestinationPath);
+
+			if(!Directory.Exists(destinationDir))
+			{
+				Directory.CreateDirectory(destinationDir);
+			}
+
 			File.Copy(
 				Path.Combine(originPath, diffFilePath),
-				Path.Combine(destinationPath, diffFilePath),
+				fullDestinationPath,
 				true);
 		}
 
@@ -164,6 +172,13 @@ public class DropboxSync : EditorWindow
 	/// <param name="binaryDirPath">Binary dir path.</param>
 	static Dictionary<string, byte[]> ComputeBinaryDirHash(string binaryDirPath)
 	{
+		//path needs to end in the dir seperator in order
+		// to properly replace root directory when computing hash keys.
+		if(!binaryDirPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+		{
+			binaryDirPath += Path.DirectorySeparatorChar;
+		}
+
 		Stack<DirectoryInfo> directories = new Stack<DirectoryInfo>();
 
 		directories.Push (new DirectoryInfo(binaryDirPath));
@@ -179,7 +194,8 @@ public class DropboxSync : EditorWindow
 			{
 				// we only want the sub-dir path, otherwise the keys will not
 				//  match between DropBox and local.
-				computedHashes.Add(file.FullName.Replace(binaryDirPath, ""), Md5Sum(file.FullName));
+				string key = file.FullName.Replace(binaryDirPath, "");
+				computedHashes.Add(key, Md5Sum(file.FullName));
 			}
 
 			// push sub dirs onto the stack.

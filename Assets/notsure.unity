@@ -7211,7 +7211,7 @@ MonoBehaviour:
   m_Script: {fileID: 12000, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TerrainData: {fileID: 0}
+  m_TerrainData: {fileID: 15600000, guid: 519d0c9291a294b8db17df19e6ce95b9, type: 2}
   m_TreeDistance: 2000
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
