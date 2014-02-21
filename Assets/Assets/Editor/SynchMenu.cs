@@ -51,6 +51,8 @@ public class DropboxSync : EditorWindow
 	[MenuItem ("Sync/Smart Sync")]
 	static void SmartSync ()
 	{
+		Debug.Log ("Starting asset sync...");
+
 		dropboxAssetPath = EditorPrefs.GetString("dropbox_path", "c:/users/example/dropbox");
 		md5FilePath = EditorPrefs.GetString ("md5_path", "c:/users/example/md5");
 		localAssetPath = EditorPrefs.GetString ("local_asset_path", "Assets/Binaries");
@@ -75,6 +77,10 @@ public class DropboxSync : EditorWindow
 
 		// save our new localMd5 for the next comparison.
 		SaveMd5ToDisk (GetMd5SavePath(md5FilePath), ComputeBinaryDirHash (localAssetPath));
+
+		AssetDatabase.Refresh();
+				
+		Debug.Log("Done Syncing Assets.");
 	}
 
 	/// <summary>
@@ -201,6 +207,7 @@ public class DropboxSync : EditorWindow
 				// we only want the sub-dir path, otherwise the keys will not
 				//  match between DropBox and local.
 				string key = file.FullName.Replace(binaryDirPath, "");
+
 				computedHashes.Add(key, Md5Sum(file.FullName));
 			}
 
