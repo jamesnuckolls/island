@@ -61,7 +61,7 @@ public class DropboxSync : EditorWindow
 		var diskMd5 = GetMd5FromDisk (md5FilePath);
 
 		// load current md5
-		var localMd5 = ComputeBinaryDirHash (localAssetPath);¬
+		var localMd5 = ComputeBinaryDirHash (localAssetPath);
 
 		// compare hashes, overwriting and copying new anything that
 		//  is different from local to dropbox
