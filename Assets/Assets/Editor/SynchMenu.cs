@@ -8,7 +8,7 @@ public class DropboxSync : EditorWindow
 {
 	
 	public static string dropboxAssetPath;
-	public static string md5FilePath;
+	public static string md5DirPath;
 	public static string localAssetPath;
 
 	//public static string localAssetPath = "/Users/jnuckolls/Documents/Programming/game/island/Assets/Binaries/";
@@ -20,7 +20,7 @@ public class DropboxSync : EditorWindow
 	static void SetFolder () 
 	{
 		dropboxAssetPath = EditorPrefs.GetString("dropbox_path", "c:/users/example/dropbox");
-		md5FilePath = EditorPrefs.GetString ("md5_path", md5FilePath);
+		md5DirPath = EditorPrefs.GetString ("md5_path", md5DirPath);
 		localAssetPath = EditorPrefs.GetString ("local_asset_path", localAssetPath);
 		EditorWindow.GetWindow<DropboxSync>();
 	}
@@ -54,11 +54,13 @@ public class DropboxSync : EditorWindow
 		Debug.Log ("Starting asset sync...");
 
 		dropboxAssetPath = EditorPrefs.GetString("dropbox_path", "c:/users/example/dropbox");
-		md5FilePath = EditorPrefs.GetString ("md5_path", "c:/users/example/md5");
+		md5DirPath = EditorPrefs.GetString ("md5_path", "c:/users/example/md5");
 		localAssetPath = EditorPrefs.GetString ("local_asset_path", "Assets/Binaries");
 
+		string md5FullPath = GetMd5SavePath (md5DirPath);
+
 		// load serialized md5
-		var diskMd5 = GetMd5FromDisk (md5FilePath);
+		var diskMd5 = GetMd5FromDisk (md5FullPath);
 
 		// load current md5
 		var localMd5 = ComputeBinaryDirHash (localAssetPath);
@@ -76,7 +78,7 @@ public class DropboxSync : EditorWindow
 		synchDirectory (dropboxAssetPath, dropBoxMd5, localAssetPath, localMd5);
 
 		// save our new localMd5 for the next comparison.
-		SaveMd5ToDisk (GetMd5SavePath(md5FilePath), ComputeBinaryDirHash (localAssetPath));
+		SaveMd5ToDisk (md5FullPath, ComputeBinaryDirHash (localAssetPath));
 
 		AssetDatabase.Refresh();
 				
@@ -128,16 +130,14 @@ public class DropboxSync : EditorWindow
 	/// <param name="md5Path">Md5 path.</param>
 	static Dictionary<string, byte[]> GetMd5FromDisk(string md5Path)
 	{
-		string savePath = GetMd5SavePath (md5Path);
-
-		if(!File.Exists(savePath))
+		if(!File.Exists(md5Path))
 		{
-			return SaveMd5ToDisk(savePath, ComputeBinaryDirHash(localAssetPath));
+			return SaveMd5ToDisk(md5Path, ComputeBinaryDirHash(localAssetPath));
 		}
 
 		Dictionary<string, byte[]> md5Dict = new Dictionary<string, byte[]>();
 
-		using(var fileStream = new StreamReader (savePath))
+		using(var fileStream = new StreamReader (md5Path))
 		{
 
 			BinaryFormatter serializer = new BinaryFormatter ();
@@ -169,12 +169,12 @@ public class DropboxSync : EditorWindow
 	{
 		GUILayout.Label ("Set a path to a folder in dropbox that will contain your binary assets.", EditorStyles.boldLabel);
 		dropboxAssetPath = EditorGUILayout.TextField ("DropBox Path", dropboxAssetPath);
-		md5FilePath = EditorGUILayout.TextField ("TempPath", md5FilePath);
+		md5DirPath = EditorGUILayout.TextField ("TempPath", md5DirPath);
 		localAssetPath = EditorGUILayout.TextField ("Local Asset Path", localAssetPath);
 
 		if(GUILayout.Button("Save")) {
 			EditorPrefs.SetString("dropbox_path", dropboxAssetPath);
-			EditorPrefs.SetString ("md5_path", md5FilePath);
+			EditorPrefs.SetString ("md5_path", md5DirPath);
 			EditorPrefs.SetString ("local_asset_path", localAssetPath);
 		}
 	}
