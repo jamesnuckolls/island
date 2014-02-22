@@ -61,13 +61,13 @@ public class DropboxSync : EditorWindow
 		var diskMd5 = GetMd5FromDisk (md5FilePath);
 
 		// load current md5
-		var localMd5 = ComputeBinaryDirHash (localAssetPath);
+		var localMd5 = ComputeBinaryDirHash (localAssetPath);¬
 
 		// compare hashes, overwriting and copying new anything that
 		//  is different from local to dropbox
 		//  to do this we set destination Hash to the current local has, triggering
 		//  a copy for any file that is different than our previous synch.
-		synchDirectory (localAssetPath, diskMd5, dropboxAssetPath, localMd5);
+		synchDirectory (localAssetPath, localMd5, dropboxAssetPath, diskMd5);
 
 		// load dropbox md5 after the copy
 		var dropBoxMd5 = ComputeBinaryDirHash (dropboxAssetPath);
@@ -238,19 +238,19 @@ public class DropboxSync : EditorWindow
 	}
 
 	/// <summary>
-	/// Gets the difference between authority and current.  Returns a list of paths from auth
+	/// Gets the difference between original and current.  Returns a list of paths that are different between the two.
 	/// </summary>
 	/// <returns>The diff files.</returns>
-	/// <param name="authority">Authority.</param>
+	/// <param name="original">Authority.</param>
 	/// <param name="current">Current.</param>
-	static List<string> GetDiffFiles(Dictionary<string, byte []> authority, Dictionary<string, byte []> diff)
+	static List<string> GetDiffFiles(Dictionary<string, byte []> originHahs, Dictionary<string, byte []> destinationHash)
 	{
 		List<string> diffFiles = new List<string> ();
-		foreach(string key in authority.Keys)
+		foreach(string key in  originHahs.Keys)
 		{
-			if(diff.ContainsKey(key))
+			if(destinationHash.ContainsKey(key))
 			{
-				if(CompareByteArrays(authority[key], diff[key]))
+				if(CompareByteArrays(originHahs[key], destinationHash[key]))
 				{
 					continue;
 				}
