@@ -128,14 +128,16 @@ public class DropboxSync : EditorWindow
 	/// <param name="md5Path">Md5 path.</param>
 	static Dictionary<string, byte[]> GetMd5FromDisk(string md5Path)
 	{
-		if(!File.Exists(md5Path))
+		string savePath = GetMd5SavePath (md5Path);
+
+		if(!File.Exists(savePath))
 		{
-			return SaveMd5ToDisk(GetMd5SavePath(md5Path), ComputeBinaryDirHash(localAssetPath));
+			return SaveMd5ToDisk(savePath, ComputeBinaryDirHash(localAssetPath));
 		}
 
 		Dictionary<string, byte[]> md5Dict = new Dictionary<string, byte[]>();
 
-		using(var fileStream = new StreamReader (md5Path))
+		using(var fileStream = new StreamReader (savePath))
 		{
 
 			BinaryFormatter serializer = new BinaryFormatter ();
